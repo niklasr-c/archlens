@@ -22,22 +22,21 @@ export async function GET() {
 
     // 2. Der magische Aufruf via Vercel AI SDK
     // 2. Der magische Aufruf via Vercel AI SDK (Jetzt mit Llama 3.1 auf Groq)
+    // 2. Der magische Aufruf via Vercel AI SDK (Llama 3.3 auf Groq)
     const { text } = await generateText({
-      model: groq('llama-3.3-70b-versatile'), // Das Open-Source Monster
-      system: `Du bist ein erfahrener Senior Software Architect und DevSecOps Experte. 
-      Deine Aufgabe ist es, Codebasen messerscharf zu analysieren. Sei direkt, professionell und präzise. 
-      Vermeide Floskeln. Antworte auf Deutsch. Formatier deine Antwort sauber mit Markdown.`,
-      prompt: `Hier ist der gesamte Quellcode eines Repositories.
+      model: groq('llama-3.3-70b-versatile'),
+      system: `You are an elite Senior Software Architect and DevSecOps Expert. 
+      Your job is to perform ruthless but constructive code reviews. 
+      Be direct, professional, and concise. Avoid fluff. Answer in English. Use clean Markdown formatting.`,
+      prompt: `Analyze the following repository source code and generate a "Vibe Check Report" covering these 3 aspects:
       
-      Bitte erstelle mir einen "Vibe Check Report" mit folgenden 3 Punkten:
-      1. Architektur-Zusammenfassung (max. 3 Sätze): Was ist das für ein Projekt, wie ist es strukturiert und welcher Tech-Stack wird primär genutzt?
-      2. Tech-Debt & "Vibe Coding" Risiken: Nenne mir die 2 größten architektonischen Schwächen oder "Quick & Dirty"-Lösungen, die du siehst.
-      3. Security: Gibt es offensichtliche Sicherheitsrisiken oder Best-Practice-Verstöße?
+      1. Architecture Summary (max 3 sentences): What is the project, its core structure, and primary tech stack?
+      2. Tech Debt & "Vibe Coding" Risks: Identify the 2 most critical architectural flaws, anti-patterns, or "quick & dirty" hacks.
+      3. Security & Best Practices: Point out any glaring security vulnerabilities or major best-practice violations.
       
-      Hier ist der Code:
+      Repository Code:
       ${codeContext}`
     });
-    
 
     const duration = Date.now() - startTime;
     console.log(`Analyse fertig in ${duration}ms`);
