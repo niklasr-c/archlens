@@ -1,16 +1,6 @@
 import JSZip from 'jszip';
+import { ANALYSIS_CONFIG, GITHUB_CONFIG } from "./constants";
 
-// 1. Endungen, die wir ignorieren (Neu: Datenbanken und Medien)
-const IGNORE_EXTENSIONS = [
-  '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.pdf', 
-  '.db', '.sqlite', '.sqlite3', '.zip', '.tar', '.mp4'
-];
-
-// 2. Ordner, die wir komplett skippen
-const IGNORE_PATHS = ['node_modules/', 'dist/', 'build/', '.git/', '.next/', '.vercel/'];
-
-// 3. Spezifische Dateien, die riesig und wertlos für die KI sind
-const IGNORE_FILES = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb'];
 export interface RepoFile {
   path: string;
   content: string;
@@ -47,11 +37,12 @@ export async function fetchAndExtractRepo(owner: string, repo: string): Promise<
 
     const fileName = relativePath.split('/').pop() || '';
 
-    const isIgnoredExt = IGNORE_EXTENSIONS.some((ext) => relativePath.endsWith(ext));
-    const isIgnoredPath = IGNORE_PATHS.some((path) => relativePath.includes(path));
-    const isIgnoredFile = IGNORE_FILES.includes(fileName);
+    const isIgnored = 
+      ANALYSIS_CONFIG.IGNORE_EXTENSIONS.some(ext => fileName.endsWith(ext)) ||
+      ANALYSIS_CONFIG.IGNORE_PATHS.some(dir => fileName.includes(dir)) ||
+      ANALYSIS_CONFIG.IGNORE_FILES.some(file => fileName.endsWith(file)); // oder includes(file) je nachdem wie du es hattest
 
-    if (isIgnoredExt || isIgnoredPath || isIgnoredFile) continue;
+    if (isIgnored) continue;
 
     // Lese den Datei-Inhalt als String
     const content = await file.async('string');
