@@ -45,4 +45,10 @@ Want to run ArchLens locally?
     GROQ_API_KEY=gsk_your_groq_api_key_here
 4. **Run the development server:**
     npm run dev
-    Open http://localhost:3000 in your browser to see the result.    
+    Open http://localhost:3000 in your browser to see the result.  
+
+---
+
+## ⚖️ License
+
+All rights reserved. This project is currently provided for educational and review purposes only. No part of this repository may be redistributed or used for commercial purposes without explicit permission.
