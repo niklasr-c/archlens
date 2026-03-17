@@ -61,7 +61,7 @@ export default function Home() {
             <input
               type="text"
               className="block w-full pl-12 pr-32 py-4 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-              placeholder="niklasr-c/dev-utility-bot"
+              placeholder="owner/repository-name"
               value={repoUrl}
               onChange={(e) => setRepoUrl(e.target.value)}
               required
