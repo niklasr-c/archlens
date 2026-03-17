@@ -37,8 +37,8 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-200 selection:bg-indigo-500/30 font-sans">
-      <div className="max-w-4xl mx-auto px-6 py-20">
+    <main className="flex flex-col min-h-screen bg-slate-950 text-slate-200 font-sans">
+      <div className="flex-grow max-w-4xl mx-auto px-6 py-20">
         
         {/* Header Section */}
         <div className="text-center mb-16">
@@ -104,6 +104,24 @@ export default function Home() {
         )}
 
       </div>
+    {/* Footer */}
+        <footer className="mt-20 border-t border-slate-800/50 pt-8 pb-12 text-center text-slate-500 text-sm">
+          <p className="mb-4">
+            Built with ⚡️ by <a href="https://github.com/niklasr-c" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 transition-colors">Niklas</a>.
+          </p>
+          <div className="flex justify-center items-center gap-6 mb-4">
+            <a href="mailto:archlens@mail.de?subject=Feedback ArchLens" className="hover:text-white transition-colors">
+              Feedback senden
+            </a>
+            <span className="text-slate-700">•</span>
+            <a href="https://github.com/niklasr-c/archlens" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              Source Code
+            </a>
+          </div>
+          <p className="text-xs text-slate-600 mb-2">
+            Dies ist ein nicht-kommerzielles Open-Source-Projekt.
+          </p>
+        </footer>
     </main>
   );
 }
