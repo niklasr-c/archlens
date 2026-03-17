@@ -3,26 +3,28 @@ import { fetchAndExtractRepo } from '@/lib/github';
 import { generateText } from 'ai';
 import { groq } from '@ai-sdk/groq';
 
-export async function GET() {
+export async function POST(req: Request) {
   try {
-    const owner = 'niklasr-c'; 
-    const repo = 'dev-utility-bot';
+    // 1. URL aus dem Frontend-Request lesen
+    const body = await req.json();
+    const { repoUrl } = body;
 
-    console.log(`Lade ${owner}/${repo} herunter...`);
+    if (!repoUrl) {
+      return NextResponse.json({ success: false, error: "Bitte eine GitHub-URL angeben." }, { status: 400 });
+    }
+
+    // 2. URL parsen (Macht aus "https://github.com/niklas/bot" -> owner: "niklas", repo: "bot")
+    const urlParts = repoUrl.replace('https://github.com/', '').split('/');
+    const owner = urlParts[0];
+    const repo = urlParts[1];
+
+    console.log(`Analysiere ${owner}/${repo}...`);
+    
+    // 3. Repo laden
     const files = await fetchAndExtractRepo(owner, repo);
+    const codeContext = files.map((f) => `--- Datei: ${f.path} ---\n${f.content}\n`).join('\n');
 
-    // 1. Den "Prompt-Kontext" bauen: Wir kleben alle Dateien aneinander
-    // Das geht nur 2026, weil Gemini Flash ein gigantisches Kontextfenster hat!
-    const codeContext = files
-      .map((f) => `--- Datei: ${f.path} ---\n${f.content}\n`)
-      .join('\n');
-
-    console.log(`Starte KI-Analyse mit Gemini 1.5 Flash... (${files.length} Dateien)`);
-    const startTime = Date.now();
-
-    // 2. Der magische Aufruf via Vercel AI SDK
-    // 2. Der magische Aufruf via Vercel AI SDK (Jetzt mit Llama 3.1 auf Groq)
-    // 2. Der magische Aufruf via Vercel AI SDK (Llama 3.3 auf Groq)
+    // 4. KI-Analyse (Llama 3.3 via Groq)
     const { text } = await generateText({
       model: groq('llama-3.3-70b-versatile'),
       system: `You are an elite Senior Software Architect and DevSecOps Expert. 
@@ -38,15 +40,7 @@ export async function GET() {
       ${codeContext}`
     });
 
-    const duration = Date.now() - startTime;
-    console.log(`Analyse fertig in ${duration}ms`);
-
-    return NextResponse.json({
-      success: true,
-      repo: `${owner}/${repo}`,
-      durationMs: duration,
-      analysis: text, // Hier steckt die pure KI-Magie drin!
-    });
+    return NextResponse.json({ success: true, analysis: text });
 
   } catch (error: any) {
     console.error("Fehler:", error);
