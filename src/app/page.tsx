@@ -81,6 +81,9 @@ export default function Home() {
               )}
             </button>
           </div>
+          <p className="mt-3 text-center text-xs text-slate-500/80 tracking-wide">
+            Note: Currently only supports <span className="text-slate-400 font-medium">public</span> GitHub repositories.
+          </p>
         </form>
 
         {/* Error Message */}
@@ -111,7 +114,7 @@ export default function Home() {
           </p>
           <div className="flex justify-center items-center gap-6 mb-4">
             <a href="mailto:archlens@mail.de?subject=Feedback ArchLens" className="hover:text-white transition-colors">
-              Feedback senden
+              Feedback 
             </a>
             <span className="text-slate-700">•</span>
             <a href="https://github.com/niklasr-c/archlens" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
@@ -119,7 +122,9 @@ export default function Home() {
             </a>
           </div>
           <p className="text-xs text-slate-600 mb-2">
-            Dies ist ein nicht-kommerzielles Open-Source-Projekt.
+            <p className="text-xs text-slate-600 mb-2">
+             This is a non-commercial open-source project.
+            </p>  
           </p>
         </footer>
     </main>
