@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Search, ShieldAlert, Activity, GitBranch } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import CopyButton from "@/components/CopyButton"; 
 
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState("");
@@ -97,9 +98,18 @@ export default function Home() {
         {/* Report Results */}
         {report && (
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2 border-b border-slate-800 pb-4">
-              <Activity className="text-indigo-400" /> Vibe Check Report
-            </h2>
+          <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+            {/* Wir nutzen translate-y-[2px] um den linken Block optisch exakt auf die Button-Höhe zu schieben */}
+            <div className="flex items-center gap-2 translate-y-[4.5px]">
+              <Activity size={24} className="text-indigo-400" /> 
+              <h2 className="text-xl font-bold text-white m-0 leading-none">
+                Vibe Check Report
+              </h2>
+            </div>
+
+            <CopyButton textToCopy={report} />
+
+          </div> 
             <div className="prose prose-invert prose-indigo max-w-none">
               <ReactMarkdown>{report}</ReactMarkdown>
             </div>
@@ -121,11 +131,9 @@ export default function Home() {
               Source Code
             </a>
           </div>
-          <p className="text-xs text-slate-600 mb-2">
             <p className="text-xs text-slate-600 mb-2">
              This is a non-commercial open-source project.
-            </p>  
-          </p>
+            </p>           
         </footer>
     </main>
   );
