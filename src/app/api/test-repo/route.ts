@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { fetchAndExtractRepo } from '@/lib/github';
 import { generateText } from 'ai';
-import { google } from '@ai-sdk/google';
+import { groq } from '@ai-sdk/groq';
 
 export async function GET() {
   try {
@@ -21,8 +21,9 @@ export async function GET() {
     const startTime = Date.now();
 
     // 2. Der magische Aufruf via Vercel AI SDK
+    // 2. Der magische Aufruf via Vercel AI SDK (Jetzt mit Llama 3.1 auf Groq)
     const { text } = await generateText({
-      model: google('gemini-2.0-flash'),
+      model: groq('llama-3.1-70b-versatile'), // Das Open-Source Monster
       system: `Du bist ein erfahrener Senior Software Architect und DevSecOps Experte. 
       Deine Aufgabe ist es, Codebasen messerscharf zu analysieren. Sei direkt, professionell und präzise. 
       Vermeide Floskeln. Antworte auf Deutsch. Formatier deine Antwort sauber mit Markdown.`,
@@ -36,6 +37,7 @@ export async function GET() {
       Hier ist der Code:
       ${codeContext}`
     });
+    
 
     const duration = Date.now() - startTime;
     console.log(`Analyse fertig in ${duration}ms`);
