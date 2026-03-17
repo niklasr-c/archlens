@@ -23,7 +23,7 @@ export async function GET() {
     // 2. Der magische Aufruf via Vercel AI SDK
     // 2. Der magische Aufruf via Vercel AI SDK (Jetzt mit Llama 3.1 auf Groq)
     const { text } = await generateText({
-      model: groq('llama-3.1-70b-versatile'), // Das Open-Source Monster
+      model: groq('llama-3.3-70b-versatile'), // Das Open-Source Monster
       system: `Du bist ein erfahrener Senior Software Architect und DevSecOps Experte. 
       Deine Aufgabe ist es, Codebasen messerscharf zu analysieren. Sei direkt, professionell und präzise. 
       Vermeide Floskeln. Antworte auf Deutsch. Formatier deine Antwort sauber mit Markdown.`,
