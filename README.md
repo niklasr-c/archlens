@@ -19,10 +19,6 @@ ArchLens isn't just a simple API wrapper; it's built for speed and efficiency us
 - **Beautiful Markdown UI:** Custom dark-mode UI built with Tailwind CSS v4 and `@tailwindcss/typography` for perfectly formatted, highly readable security and architecture reports.
 
 ---
-...
-- **Beautiful Markdown UI:** Custom dark-mode UI built with Tailwind CSS v4 and `@tailwindcss/typography` for perfectly formatted, highly readable security and architecture reports.
-
----
 
 ### 🤖 Built for the Agentic Coding Era
 
@@ -55,6 +51,7 @@ Want to run ArchLens locally?
    ```bash
    npm install
 3. **Set up Enviroment Variables:**
+    ```bash
     Create a .env.local file in the root directory and add your free Groq API key:
     GROQ_API_KEY=gsk_your_groq_api_key_here
 4. **Run the development server:**
