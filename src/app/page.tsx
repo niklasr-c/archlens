@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Search, ShieldAlert, Activity, GitBranch } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import CopyButton from "@/components/CopyButton"; 
+import CopyPromptButton from "@/components/CopyPromptButton";
 
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState("");
@@ -106,9 +107,10 @@ export default function Home() {
                 Vibe Check Report
               </h2>
             </div>
-
-            <CopyButton textToCopy={report} />
-
+            <div className="flex items-center gap-3">
+              <CopyButton textToCopy={report} />
+              <CopyPromptButton reportText={report} />
+            </div>
           </div> 
             <div className="prose prose-invert prose-indigo max-w-none">
               <ReactMarkdown>{report}</ReactMarkdown>
