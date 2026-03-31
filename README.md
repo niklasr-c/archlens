@@ -24,9 +24,9 @@ ArchLens isn't just a simple API wrapper; it's built for speed and efficiency us
 
 ArchLens doesn't just point out your tech debt—it helps you fix it without breaking your workflow. 
 
-Instead of generating code that competes with your IDE, ArchLens acts as an independent auditor. Once the audit is complete, simply click **"Fix with AI Agent"**. ArchLens will instantly generate a structured master-prompt containing your full DevSecOps report. 
+Instead of generating code that competes with your IDE, ArchLens acts as an independent auditor. Once the audit is complete, simply click **"Fix with AI Agent"**. 
 
-Just paste it into **Cursor, GitHub Copilot Workspace, or Claude**, and watch your agent systematically clean up the architectural flaws.
+ArchLens will instantly generate a **strict TDD (Test-Driven Development) master-prompt** containing your full DevSecOps report. Paste it into **Cursor, GitHub Copilot Workspace, or Claude**, and the agent will be forced to write failing tests first, setting hard boundaries before it refactors any of your architecture.
 
 ---
 
