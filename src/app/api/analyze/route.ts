@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { fetchAndExtractRepo } from '@/lib/github';
 import { generateText } from 'ai';
 import { groq } from '@ai-sdk/groq';
+import { getToken } from 'next-auth/jwt';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     // 1. URL aus dem Frontend-Request lesen
     const body = await req.json();
@@ -13,16 +14,32 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Bitte eine GitHub-URL angeben." }, { status: 400 });
     }
 
-    // 2. URL parsen (Macht aus "https://github.com/niklas/bot" -> owner: "niklas", repo: "bot")
-    const urlParts = repoUrl.replace('https://github.com/', '').split('/');
+    // Den GitHub Token des eingeloggten Users auslesen
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const accessToken = token?.accessToken as string | undefined;
+
+    // 2. URL parsen
+    const urlParts = repoUrl.replace('https://github.com/', '').replace(/\/$/, '').split('/');
     const owner = urlParts[0];
     const repo = urlParts[1];
 
-    console.log(`Analysiere ${owner}/${repo}...`);
+    console.log(`Analysiere ${owner}/${repo}... (Eingeloggt: ${!!accessToken})`);
     
-    // 3. Repo laden
-    const files = await fetchAndExtractRepo(owner, repo);
-    const codeContext = files.map((f) => `--- Datei: ${f.path} ---\n${f.content}\n`).join('\n');
+    // 3. Repo laden 
+    const files = await fetchAndExtractRepo(owner, repo, accessToken);
+    
+    // Hier bauen wir den Kontext zusammen
+    let codeContext = files.map((f) => `--- Datei: ${f.path} ---\n${f.content}\n`).join('\n');
+
+    // 🛡️ DER GROQ-SCHUTZSCHILD
+    // Groq Free Tier Limit liegt oft bei ca. 12.000 Tokens. 
+    // Ein Token sind ca. 4 Zeichen. Wir kappen bei 35.000 Zeichen,
+    // damit noch Platz für den System-Prompt und die Antwort ist.
+    const MAX_CHARS = 35000; 
+    if (codeContext.length > MAX_CHARS) {
+      console.log(`⚠️ Repo ist zu groß (${codeContext.length} Zeichen). Kürze auf ${MAX_CHARS} für Groq...`);
+      codeContext = codeContext.substring(0, MAX_CHARS) + "\n\n... [ACHTUNG: WEITERE DATEIEN WEGEN LÄNGENLIMIT ABGESCHNITTEN] ...";
+    }
 
     // 4. KI-Analyse (Llama 3.3 via Groq)
     const { text } = await generateText({
@@ -44,6 +61,7 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error("Fehler:", error);
+    // Wir geben den Fehlertext an das Frontend weiter, damit du siehst was los ist
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

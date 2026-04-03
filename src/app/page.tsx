@@ -5,6 +5,7 @@ import { Search, ShieldAlert, Activity, GitBranch } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import CopyButton from "@/components/CopyButton"; 
 import CopyPromptButton from "@/components/CopyPromptButton";
+import AuthButton from "@/components/authbutton";
 
 export default function Home() {
   const [repoUrl, setRepoUrl] = useState("");
@@ -39,7 +40,13 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col min-h-screen bg-slate-950 text-slate-200 font-sans">
+    <main className="relative flex flex-col min-h-screen bg-slate-950 text-slate-200 font-sans">
+      
+      {/* Login Button - Oben rechts schwebend */}
+      <div className="absolute top-6 right-6">
+        <AuthButton />
+      </div>
+
       <div className="flex-grow max-w-4xl mx-auto px-6 py-20">
         
         {/* Header Section */}
@@ -84,8 +91,8 @@ export default function Home() {
             </button>
           </div>
           <p className="mt-3 text-center text-xs text-slate-500/80 tracking-wide">
-            Note: Currently only supports <span className="text-slate-400 font-medium">public</span> GitHub repositories.
-          </p>
+  Analyze both <span className="text-indigo-400 font-medium">public</span> and <span className="text-indigo-400 font-medium">private</span> repositories.
+</p>
         </form>
 
         {/* Error Message */}
@@ -119,24 +126,25 @@ export default function Home() {
         )}
 
       </div>
-    {/* Footer */}
-        <footer className="mt-20 border-t border-slate-800/50 pt-8 pb-12 text-center text-slate-500 text-sm">
-          <p className="mb-4">
-            Built with ⚡️ by <a href="https://github.com/niklasr-c" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 transition-colors">Niklas</a>.
-          </p>
-          <div className="flex justify-center items-center gap-6 mb-4">
-            <a href="mailto:archlens@mail.de?subject=Feedback ArchLens" className="hover:text-white transition-colors">
-              Feedback 
-            </a>
-            <span className="text-slate-700">•</span>
-            <a href="https://github.com/niklasr-c/archlens" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-              Source Code
-            </a>
-          </div>
-            <p className="text-xs text-slate-600 mb-2">
-             This is a non-commercial open-source project.
-            </p>           
-        </footer>
+      
+      {/* Footer */}
+      <footer className="mt-20 border-t border-slate-800/50 pt-8 pb-12 text-center text-slate-500 text-sm">
+        <p className="mb-4">
+          Built with ⚡️ by <a href="https://github.com/niklasr-c" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 transition-colors">Niklas</a>.
+        </p>
+        <div className="flex justify-center items-center gap-6 mb-4">
+          <a href="mailto:archlens@mail.de?subject=Feedback ArchLens" className="hover:text-white transition-colors">
+            Feedback 
+          </a>
+          <span className="text-slate-700">•</span>
+          <a href="https://github.com/niklasr-c/archlens" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+            Source Code
+          </a>
+        </div>
+          <p className="text-xs text-slate-600 mb-2">
+           This is a non-commercial open-source project.
+          </p>           
+      </footer>
     </main>
   );
 }

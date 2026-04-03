@@ -6,33 +6,44 @@ export interface RepoFile {
   content: string;
 }
 
-export async function fetchAndExtractRepo(owner: string, repo: string): Promise<RepoFile[]> {
-  // 1. Lade das gesamte Repo als Zipball herunter (1 einziger API Call!)
+// 1. NEU: token als optionaler 3. Parameter hinzugefügt!
+export async function fetchAndExtractRepo(owner: string, repo: string, token?: string): Promise<RepoFile[]> {
   const url = `https://api.github.com/repos/${owner}/${repo}/zipball`;
   
+  // 2. Headers vorbereiten
+  const headers: Record<string, string> = {
+    'Accept': 'application/vnd.github.v3+json',
+    'User-Agent': 'ArchLens-Portfolio-Project',
+  };
+
+  // 3. Token-Check mit Log für unser Terminal
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    console.log("🔑 Token aktiv! Startet mit:", token.substring(0, 4)); 
+  } else {
+    console.log("⚠️ ACHTUNG: Kein Token in der github.ts angekommen!");
+  }
+
+  // 4. Der Fetch MIT deaktiviertem Next.js Cache
   const response = await fetch(url, {
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'ArchLens-Portfolio-Project',
-    },
+    headers: headers,
+    cache: 'no-store', // <-- Tötet den Next.js Cache
   });
 
   if (!response.ok) {
     throw new Error(`GitHub API Error: ${response.status} - Konnte das Repo nicht laden.`);
   }
 
-  // 2. Lade den Zip-Inhalt in den Arbeitsspeicher
+  // Lade den Zip-Inhalt in den Arbeitsspeicher
   const arrayBuffer = await response.arrayBuffer();
   const zip = await JSZip.loadAsync(arrayBuffer);
 
   const files: RepoFile[] = [];
 
-  // 3. Iteriere durch die entpackten Dateien
+  // Iteriere durch die entpackten Dateien
   for (const relativePath of Object.keys(zip.files)) {
     const file = zip.files[relativePath];
 
-    // Ordner ignorieren wir, wir wollen nur die reinen Text-Dateien
-    // ... in der for-Schleife:
     if (file.dir) continue;
 
     const fileName = relativePath.split('/').pop() || '';
@@ -40,15 +51,11 @@ export async function fetchAndExtractRepo(owner: string, repo: string): Promise<
     const isIgnored = 
       ANALYSIS_CONFIG.IGNORE_EXTENSIONS.some(ext => fileName.endsWith(ext)) ||
       ANALYSIS_CONFIG.IGNORE_PATHS.some(dir => fileName.includes(dir)) ||
-      ANALYSIS_CONFIG.IGNORE_FILES.some(file => fileName.endsWith(file)); // oder includes(file) je nachdem wie du es hattest
+      ANALYSIS_CONFIG.IGNORE_FILES.some(file => fileName.endsWith(file));
 
     if (isIgnored) continue;
 
-    // Lese den Datei-Inhalt als String
     const content = await file.async('string');
-    
-    // GitHub packt das Repo in einen Hauptordner (z.B. owner-repo-hash/). 
-    // Den schneiden wir für eine saubere Pfad-Struktur ab.
     const cleanPath = relativePath.split('/').slice(1).join('/');
 
     files.push({
