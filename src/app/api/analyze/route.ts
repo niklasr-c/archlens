@@ -28,18 +28,51 @@ export async function POST(req: NextRequest) {
     // 3. Repo laden 
     const files = await fetchAndExtractRepo(owner, repo, accessToken);
     
-    // Hier bauen wir den Kontext zusammen
-    let codeContext = files.map((f) => `--- Datei: ${f.path} ---\n${f.content}\n`).join('\n');
+    // ---------------------------------------------------------
+    // 🧠 INTELLIGENT CONTEXT MANAGEMENT ("SKELETON PATH")
+    // ---------------------------------------------------------
+    
+    // A. Das Skelett: Eine Liste ALLER Dateipfade (zeigt der KI die Architektur)
+    const fileTree = files.map(f => f.path).join('\n');
+    
+    // B. High-Signal Files (Configs, Docs, Entry Points)
+    const priorityFiles = files.filter(f => 
+      f.path.toLowerCase().includes('package.json') ||
+      f.path.toLowerCase().includes('readme.md') ||
+      f.path.toLowerCase().includes('tsconfig.json') ||
+      f.path.toLowerCase().endsWith('main.ts') ||
+      f.path.toLowerCase().endsWith('app.tsx') ||
+      f.path.toLowerCase().endsWith('main.py')
+    );
 
-    // 🛡️ DER GROQ-SCHUTZSCHILD
-    // Groq Free Tier Limit liegt oft bei ca. 12.000 Tokens. 
-    // Ein Token sind ca. 4 Zeichen. Wir kappen bei 35.000 Zeichen,
-    // damit noch Platz für den System-Prompt und die Antwort ist.
-    const MAX_CHARS = 35000; 
+    // C. Alle restlichen Dateien
+    const otherFiles = files.filter(f => !priorityFiles.includes(f));
+
+    // Kontext strategisch aufbauen
+    let codeContext = `PROJECT STRUCTURE:\n${fileTree}\n\n`;
+    codeContext += `CORE FILES:\n` + priorityFiles.map(f => `--- ${f.path} ---\n${f.content}\n`).join('\n');
+
+    const MAX_CHARS = 35000;
+    
+    // Falls Priority-Files allein schon zu groß sind, hart kappen
     if (codeContext.length > MAX_CHARS) {
-      console.log(`⚠️ Repo ist zu groß (${codeContext.length} Zeichen). Kürze auf ${MAX_CHARS} für Groq...`);
-      codeContext = codeContext.substring(0, MAX_CHARS) + "\n\n... [ACHTUNG: WEITERE DATEIEN WEGEN LÄNGENLIMIT ABGESCHNITTEN] ...";
+      codeContext = codeContext.substring(0, MAX_CHARS) + "\n\n... [ACHTUNG: KERN-DATEIEN WEGEN LIMIT ABGESCHNITTEN] ...";
+    } else {
+      // Wenn noch Platz ist, füllen wir mit restlichem Code auf
+      for (const file of otherFiles) {
+        const fileString = `--- ${file.path} ---\n${file.content}\n`;
+        // Passen wir noch rein?
+        if (codeContext.length + fileString.length < MAX_CHARS) {
+          codeContext += fileString;
+        } else {
+          codeContext += `\n... [WEITERE DATEIEN WEGEN LÄNGENLIMIT ABGESCHNITTEN] ...`;
+          break; // Stop, wir sind voll!
+        }
+      }
     }
+
+    console.log(`📊 Context built: ${codeContext.length} chars (Skeleton + High-Signal Files included)`);
+    // ---------------------------------------------------------
 
     // 4. KI-Analyse (Llama 3.3 via Groq)
     const { text } = await generateText({
